@@ -5,19 +5,19 @@ struct QuotePopup: View {
         ZStack {
             Image("parchment")
                 .resizable()
-                .scaledToFill()
+                .aspectRatio(contentMode: .fill) // Ensures better scaling
                 .frame(width: 450, height: 200)
                 .clipped()
                 .opacity(0.9)
                 .onTapGesture {
-                    QuotePopupManager.closePopup()  // Correctly close only the popup
+                    QuotePopupManager.closePopup()
                 }
 
             VStack {
                 HStack {
                     Image(ImageManager.getRandomImage())
                         .resizable()
-                        .scaledToFit()
+                        .aspectRatio(contentMode: .fit)
                         .frame(width: 150, height: 150)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                         .shadow(color: .gray, radius: 6, x: 2, y: 2)
@@ -33,13 +33,11 @@ struct QuotePopup: View {
                             .frame(maxWidth: 250, maxHeight: 100, alignment: .leading)
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(.horizontal, 5)
-                            .padding(.bottom, 5)  // Balanced bottom padding
+                            .padding(.bottom, 5)
                             .background(Color.clear)
-                            .cornerRadius(5)
                     }
-                    .frame(minHeight: 150, alignment: .center) // Ensures better vertical alignment
-                    .padding(.leading, 10)  // **Even spacing between image and text**
-                    
+                    .frame(minHeight: 150, alignment: .center)
+                    .padding(.leading, 10)
                 }
 
                 Text("Alexandre Dumas")
@@ -50,8 +48,7 @@ struct QuotePopup: View {
                     .padding(.trailing, 5)
                     .padding(.bottom, 2)
             }
-            .padding(15) // **Ensures equal padding on all four sides**
-        
+            .padding(15)
         }
         .frame(width: 450, height: 200)
         .cornerRadius(15)

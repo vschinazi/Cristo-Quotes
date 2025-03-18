@@ -2,23 +2,31 @@ import Foundation
 
 class QuoteManager {
     private static let key = "usedQuotesQueue"
+    private static var allQuotes: [String] = []
 
-    static func getRandomQuote() -> String {
-        guard let filePath = Bundle.main.path(forResource: "MonteCristoQuotes", ofType: "txt"),
+    static func loadQuotes() {
+        guard allQuotes.isEmpty,
+              let filePath = Bundle.main.path(forResource: "MonteCristoQuotes", ofType: "txt"),
               let quotes = try? String(contentsOfFile: filePath, encoding: .utf8).components(separatedBy: "\n"),
               !quotes.isEmpty else {
-            return "There is no greater misfortune than to see one’s enemy victorious."
+            allQuotes = ["There is no greater misfortune than to see one’s enemy victorious."]
+            return
         }
+        allQuotes = quotes
+    }
+
+    static func getRandomQuote() -> String {
+        loadQuotes() // Ensure quotes are loaded once
 
         var quoteQueue = UserDefaults.standard.array(forKey: key) as? [String] ?? []
 
         if quoteQueue.isEmpty {
-            quoteQueue = quotes.shuffled() // Reset shuffled list when exhausted
+            quoteQueue = allQuotes.shuffled()
         }
-        
+
         let nextQuote = quoteQueue.removeFirst()
-        UserDefaults.standard.set(quoteQueue, forKey: key) // Save updated queue
-        
+        UserDefaults.standard.set(quoteQueue, forKey: key)
+
         return nextQuote
     }
 }

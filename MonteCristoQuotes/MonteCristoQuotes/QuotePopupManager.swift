@@ -2,45 +2,44 @@ import Cocoa
 import SwiftUI
 
 class QuotePopupManager {
-    static var window: QuoteWindow?
+    private static weak var window: QuoteWindow? // Weak reference to prevent memory leaks
 
     static func showPopup() {
-        if window != nil {  // Prevent duplicate popups
+        if let existingWindow = window {
+            existingWindow.makeKeyAndOrderFront(nil) // Bring existing window to the front
             return
         }
 
         let contentView = QuotePopup()
 
-        let window = QuoteWindow(
+        let newWindow = QuoteWindow(
             contentRect: NSRect(x: 15, y: 900, width: 450, height: 200),
             styleMask: [.borderless],
             backing: .buffered,
             defer: false
         )
-        window.isOpaque = false
-        window.backgroundColor = NSColor.clear
-        window.contentView = NSHostingView(rootView: contentView)
-        window.level = .floating
-        window.isReleasedWhenClosed = false
-        window.ignoresMouseEvents = false
-        window.isMovableByWindowBackground = true
-        window.makeKeyAndOrderFront(nil)
+        newWindow.isOpaque = false
+        newWindow.backgroundColor = NSColor.clear
+        newWindow.contentView = NSHostingView(rootView: contentView)
+        newWindow.level = .floating
+        newWindow.isReleasedWhenClosed = false
+        newWindow.ignoresMouseEvents = false
+        newWindow.isMovableByWindowBackground = true
+        newWindow.makeKeyAndOrderFront(nil)
 
-        self.window = window  // Store reference to the popup window
-        NSApp.activate(ignoringOtherApps: true)  // Ensure the app remains active
+        window = newWindow
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     static func closePopup() {
-        window?.orderOut(nil)  // Hide the popup instead of fully closing it
-        window = nil  // Remove reference to allow reopening
-        NSApp.activate(ignoringOtherApps: true)  // Keep the app active to retain menu bar visibility
+        window?.orderOut(nil) // Hide the popup
+        window = nil // Allow it to be freed from memory
     }
 }
 
-// Custom NSWindow subclass to allow it to become key
+// ✅ Fix for better macOS window behavior
 class QuoteWindow: NSWindow {
-    override var canBecomeKey: Bool {
-        return true
-    }
+    override var canBecomeKey: Bool { true }
+    override var canBecomeMain: Bool { true }
 }
 
