@@ -1,20 +1,20 @@
 import Foundation
 
 class ImageManager {
-    private static var lastImage: String?
+    private static let key = "usedImagesQueue"
     
     static func getRandomImage() -> String {
-        let imageNames = (1...50).map { "image\($0)" } // Assumes image1, image2, ..., image50 exist in Assets.xcassets
+        var imageQueue = UserDefaults.standard.array(forKey: key) as? [String] ?? []
         
-        guard !imageNames.isEmpty else { return "defaultImage" } // Fallback image
+        if imageQueue.isEmpty {
+            imageQueue = (1...50).map { "image\($0)" } // Reset list
+            imageQueue.shuffle()
+        }
         
-        var newImage: String
-        repeat {
-            newImage = imageNames.randomElement() ?? "defaultImage"
-        } while newImage == lastImage  // Prevents repeating the same image
+        let nextImage = imageQueue.removeFirst()
+        UserDefaults.standard.set(imageQueue, forKey: key) // Save updated queue
         
-        lastImage = newImage
-        return newImage
+        return nextImage
     }
 }
 
